@@ -1,7 +1,18 @@
 const mqtt = require('mqtt');
-const client = mqtt.connect('mqtt://broker.hivemq.com');
+const SerialPort = require('serialport');
+const net = require('net');
 
+const client = mqtt.connect('mqtt://broker.hivemq.com');
 const TOPICO_PUBLISH = 'INCB_ESP32_envia_vazao_volume';
+
+// Configuração da porta serial (USB)
+const port = new SerialPort('/dev/ttyUSB0', { baudRate: 115200 });
+
+// Configuração do cliente TCP/IP
+const tcpClient = new net.Socket();
+tcpClient.connect(12345, '127.0.0.1', () => {
+    console.log('Conectado ao servidor TCP/IP');
+});
 
 module.exports = {
     start: function() {
@@ -11,8 +22,24 @@ module.exports = {
 
         client.on('message', (topic, message) => {
             if (topic === TOPICO_PUBLISH) {
-                console.log(`Mensagem recebida: ${message.toString()}`);
-                // Aqui você pode adicionar lógica para enviar os dados para a interface web
+                const data = message.toString();
+                console.log(`Mensagem recebida: ${data}`);
+
+                // Enviar dados via USB
+                port.write(data, (err) => {
+                    if (err) {
+                        return console.log('Erro ao enviar dados via USB:', err.message);
+                    }
+                    console.log('Dados enviados via USB');
+                });
+
+                // Enviar dados via TCP/IP
+                tcpClient.write(data, (err) => {
+                    if (err) {
+                        return console.log('Erro ao enviar dados via TCP/IP:', err.message);
+                    }
+                    console.log('Dados enviados via TCP/IP');
+                });
             }
         });
 
