@@ -1,0 +1,16 @@
+{
+  "name": "project-root-esp32_nodejs",
+  "version": "1.0.0",
+  "description": "Este projeto mede a vazão de um reservatório utilizando um ESP32 e um sensor de distância ultrassônico, e envia os dados para um servidor Node.js via MQTT. A interface web exibe os dados de vazão e volume total retirado do reservatório.",
+  "main": "p5.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1",
+    "mqtt": "^5.10.1"
+  }
+}
