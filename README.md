@@ -4,9 +4,21 @@ Este projeto mede a vazão de um reservatório utilizando um ESP32 e um sensor d
 
 ## Estrutura de Diretórios
 
-
-project-root/ │ ├── public/ │ ├── index.html │ ├── script.js │ └── style.css │ ├── server/ │ ├── server.js │ └── mqttHandler.js │ ├── node_modules/ │ ├── package.json └── package-lock.json
-
+project-root/
+│
+├── public/
+│   ├── index.html
+│   ├── script.js
+│   └── style.css
+│
+├── server/
+│   ├── server.js
+│   └── mqttHandler.js
+│
+├── node_modules/
+│
+├── package.json
+└── package-lock.json
 
 ## Configuração do Projeto
 
