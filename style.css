@@ -30,6 +30,6 @@ p {
 }
 
 .logo img {
-    width: 80px; /* Ajuste o tamanho conforme necessário */
+    width: 80px; 
     height: auto; /* Mantém a proporção da imagem */
 }
