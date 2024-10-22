@@ -1,7 +1,79 @@
-cdocument.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function() {
     let initialVolume = 20; // Volume inicial em litros
     let flowRate = 10; // Vazão inicial fictícia em L/min
     let totalVolume = initialVolume;
+
+    // Configuração dos gráficos
+    const flowRateCtx = document.getElementById('flowRateChart').getContext('2d');
+    const totalVolumeCtx = document.getElementById('totalVolumeChart').getContext('2d');
+
+    const flowRateChart = new Chart(flowRateCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Vazão (L/min)',
+                data: [],
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Tempo (s)'
+                    }
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Vazão (L/min)'
+                    }
+                }
+            }
+        }
+    });
+
+    const totalVolumeChart = new Chart(totalVolumeCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Volume Total (L)',
+                data: [],
+                borderColor: 'rgba(153, 102, 255, 1)',
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Tempo (s)'
+                    }
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Volume Total (L)'
+                    }
+                }
+            }
+        }
+    });
+
+    let time = 0;
 
     // Função para simular a retirada de água
     function simulateWaterUsage() {
@@ -11,6 +83,17 @@ cdocument.addEventListener("DOMContentLoaded", function() {
         }
         document.getElementById("flow-rate").textContent = `${flowRate} L/min`;
         document.getElementById("total-volume").textContent = `${totalVolume.toFixed(2)} L`;
+
+        // Atualiza os gráficos
+        flowRateChart.data.labels.push(time);
+        flowRateChart.data.datasets[0].data.push(flowRate);
+        flowRateChart.update();
+
+        totalVolumeChart.data.labels.push(time);
+        totalVolumeChart.data.datasets[0].data.push(totalVolume);
+        totalVolumeChart.update();
+
+        time++;
     }
 
     // Simula a retirada de água a cada segundo
