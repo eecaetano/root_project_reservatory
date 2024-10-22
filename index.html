@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoramento de Reservatório</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <h1>Monitoramento de Reservatório</h1>
@@ -13,6 +14,12 @@
         <p id="flow-rate">10 L/min</p>
         <h2>Volume Total Retirado</h2>
         <p id="total-volume">20 L</p>
+    </div>
+    <div class="chart-container">
+        <canvas id="flowRateChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="totalVolumeChart"></canvas>
     </div>
     <script src="script.js"></script>
 </body>
