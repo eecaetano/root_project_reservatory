@@ -1,0 +1,1 @@
+-- Este arquivo armazena os dados recebidos
