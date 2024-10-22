@@ -9,18 +9,25 @@
 </head>
 <body>
     <h1>Monitoramento de Reservatório</h1>
-    <div id="data">
-        <h2>Dados de Vazão</h2>
-        <p id="flow-rate">10 L/min</p>
-        <h2>Volume Total Retirado</h2>
-        <p id="total-volume">20 L</p>
+     <div id="water-level">
+        <div id="water" style="height: 200px;"></div>
     </div>
-    <div class="chart-container">
-        <canvas id="flowRateChart"></canvas>
-    </div>
-    <div class="chart-container">
-        <canvas id="totalVolumeChart"></canvas>
-    </div>
+    <div id="level-indicator">Nível: 20L</div>
+    <div id="clock">00:00:00</div>
+    <br>
+    <table id="log-table">
+        <thead>
+            <tr>
+                <th>Hora</th>
+                <th>Nível de Água (L-Ml)</th>
+                <th>Alertas</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <button id="pause-button">pause</button>
+    <button id="reset-button">reset</button>
+    <button id="print-button" onclick="imprimirResultados()">print</button>
     <script src="script.js"></script>
 </body>
 </html>
