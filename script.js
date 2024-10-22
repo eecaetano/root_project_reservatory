@@ -1,117 +1,108 @@
-document.addEventListener("DOMContentLoaded", function() {
-    let initialVolume = 20; // Volume inicial em litros
-    let flowRate = 10; // Vazão inicial fictícia em L/min
-    let totalVolume = initialVolume;
+let waterLevel = 20000; // Nível inicial da água em ml
+const maxWaterLevel = 20000; // Nível máximo da água em ml
+const minWaterLevel = 49; // Nível mínimo da água em ml
+let intervalId;
+let isPaused = false;
 
-    // Configuração dos gráficos
-    const flowRateCtx = document.getElementById('flowRateChart').getContext('2d');
-    const totalVolumeCtx = document.getElementById('totalVolumeChart').getContext('2d');
+function setup() {
+    console.log("Setup iniciado");
+    noCanvas();
+    setTimeout(() => {
+        waterLevel -= 1; // Perda inicial de 1ml após 15 segundos
+        updateWaterDisplay();
+        intervalId = setInterval(updateWaterLevel, 35000); // Intervalo de 35 segundos
+    }, 15000); // Atraso de 15 segundos
+    setInterval(updateClock, 1000);
 
-    const flowRateChart = new Chart(flowRateCtx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Vazão (L/min)',
-                data: [],
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {
-                    display: true,
-                    title: {
-                        display: true,
-                        text: 'Tempo (s)'
-                    }
-                },
-                y: {
-                    display: true,
-                    title: {
-                        display: true,
-                        text: 'Vazão (L/min)'
-                    }
-                }
-            }
+    document.getElementById('pause-button').addEventListener('click', togglePause);
+    document.getElementById('reset-button').addEventListener('click', resetSystem);
+    document.getElementById('print-button').addEventListener('click', imprimirResultados);
+}
+
+function updateWaterLevel() {
+    if (!isPaused) {
+        let alerta = "";
+
+        if (waterLevel > 10000) {
+            waterLevel -= 200; // Perda de 200ml
+        } else if (waterLevel > 5000) {
+            waterLevel -= 200; // Perda de 200ml
+            alerta = "50% abaixo do volume inicial";
+        } else if (waterLevel > 2500) {
+            waterLevel -= 2500; // Perda de 2500ml
+            alerta = "ALERTA! Nível d'água é -25%";
+        } else if (waterLevel > 1000) {
+            waterLevel -= 1500; // Perda de 1500ml
+        } else if (waterLevel > 500) {
+            waterLevel -= 500; // Perda de 500ml
+        } else if (waterLevel > 49) {
+            waterLevel -= 50; // Perda de 50ml
+        } else {
+            waterLevel = minWaterLevel;
+            alerta = "Nível de água baixo!";
+            clearInterval(intervalId);
         }
-    });
 
-    const totalVolumeChart = new Chart(totalVolumeCtx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Volume Total (L)',
-                data: [],
-                borderColor: 'rgba(153, 102, 255, 1)',
-                backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {
-                    display: true,
-                    title: {
-                        display: true,
-                        text: 'Tempo (s)'
-                    }
-                },
-                y: {
-                    display: true,
-                    title: {
-                        display: true,
-                        text: 'Volume Total (L)'
-                    }
-                }
-            }
-        }
-    });
-
-    let time = 0;
-
-    // Função para simular a retirada de água
-    function simulateWaterUsage() {
-        if (totalVolume > 0) {
-            totalVolume -= flowRate / 60; // Reduz volume com base na vazão por segundo
-            if (totalVolume < 0) totalVolume = 0; // Evita volume negativo
-        }
-        document.getElementById("flow-rate").textContent = `${flowRate} L/min`;
-        document.getElementById("total-volume").textContent = `${totalVolume.toFixed(2)} L`;
-
-        // Atualiza os gráficos
-        flowRateChart.data.labels.push(time);
-        flowRateChart.data.datasets[0].data.push(flowRate);
-        flowRateChart.update();
-
-        totalVolumeChart.data.labels.push(time);
-        totalVolumeChart.data.datasets[0].data.push(totalVolume);
-        totalVolumeChart.update();
-
-        time++;
+        updateWaterDisplay();
+        logWaterLevel(waterLevel, alerta);
     }
+}
 
-    // Simula a retirada de água a cada segundo
-    setInterval(simulateWaterUsage, 1000);
+function updateWaterDisplay() {
+    document.getElementById('water').style.height = `${(waterLevel / maxWaterLevel) * 100}%`;
+    document.getElementById('level-indicator').innerText = `Nível: ${waterLevel}ml`;
+}
 
-    // Função para atualizar os dados reais quando a conexão for estabelecida
-    function updateRealData() {
-        fetch("/data")
-            .then(response => response.text())
-            .then(data => {
-                const lines = data.trim().split("\n");
-                const flowRate = lines[lines.length - 1];
-                const totalVolume = lines.reduce((acc, val) => acc + parseInt(val), 0);
-                document.getElementById("flow-rate").textContent = `${flowRate} cm`;
-                document.getElementById("total-volume").textContent = `${totalVolume} cm`;
-            });
+function updateClock() {
+    if (!isPaused) {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        document.getElementById('clock').innerText = `Hora: ${hours}:${minutes}:${seconds}`;
     }
+}
 
-    // Tenta atualizar os dados reais a cada 10 segundos
-    setInterval(updateRealData, 10000);
-});
+function logWaterLevel(currentVolume, alerta) {
+    console.log("Registrando nível de água:", currentVolume, alerta);
+    const tableBody = document.getElementById('log-table').getElementsByTagName('tbody')[0];
+    const newRow = tableBody.insertRow();
+    const timeCell = newRow.insertCell(0);
+    const levelCell = newRow.insertCell(1);
+    const alertCell = newRow.insertCell(2);
+    timeCell.innerText = document.getElementById('clock').innerText;
+    levelCell.innerText = `${currentVolume}ml`;
+    alertCell.innerText = alerta || "Nenhum alerta";
+}
+
+function togglePause() {
+    isPaused = !isPaused;
+    document.getElementById('pause-button').innerText = isPaused ? 'Continuar' : 'Interromper';
+}
+
+function resetSystem() {
+    clearInterval(intervalId);
+    waterLevel = 20000;
+    isPaused = false;
+    document.getElementById('pause-button').innerText = 'Interromper';
+    document.getElementById('log-table').getElementsByTagName('tbody')[0].innerHTML = '';
+    updateWaterDisplay();
+    setTimeout(() => {
+        waterLevel -= 1; // Perda inicial de 1ml após 15 segundos
+        updateWaterDisplay();
+        intervalId = setInterval(updateWaterLevel, 35000); // Intervalo de 35 segundos
+    }, 15000); // Atraso de 15 segundos
+}
+
+function imprimirResultados() {
+    const capacidadeReservatorio = 20000; // Capacidade do reservatório em ml
+    const resultados = [
+        { dataHora: "2024-10-12 10:00", alerta: "Nível de água crítico", volume: 15000 },
+        { dataHora: "2024-10-12 11:00", alerta: "Nível de água crítico", volume: 14000 },
+        { dataHora: "2024-10-12 12:00", alerta: "Nível de água crítico", volume: 13000 }
+    ];
+    console.log(resultados);
+}
+
+// Inicializar o sistema
+setup();
